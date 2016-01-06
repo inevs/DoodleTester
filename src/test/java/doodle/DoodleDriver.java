@@ -4,6 +4,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -14,8 +16,6 @@ import static org.junit.Assert.assertThat;
 public class DoodleDriver {
 
 	private WebDriver driver;
-	private HomePage homePage;
-	private PollCompletionPage pollCompletionPage;
 
 	public DoodleDriver() {
 		driver = new FirefoxDriver();
@@ -23,33 +23,56 @@ public class DoodleDriver {
 	}
 
 	public void open() {
-		homePage = new HomePage(driver);
-		homePage.open();
+		driver.get("http://www.doodle.com");
 	}
 
 	public void addDate() {
-		DatePropertiesPage propertiesPage = homePage.startFindingDates();
-		propertiesPage.enterTitle("Test Termin");
-		propertiesPage.enterOrganizerName("John Doe");
-		propertiesPage.enterOrganizerMail("john.doe@local.com");
-
-		DateSuggestionPage dateSuggestionPage = propertiesPage.gotoDateSuggestion();
-		dateSuggestionPage.selectDate(getDateOfTomorrow());
-
-		pollCompletionPage = dateSuggestionPage
-				.gotoTimeslotPage()
-				.gotoConfigurePollPage()
-				.gotoConfigureVisibilityPage()
-				.completePoll();
+		startPoll();
+		enterInitialAttributes();
+		selectDates();
+		selectTimeslots();
+		configurePoll();
+		configureVisibility();
 	}
 
 	public void assertThatPageContains(String text) {
-		String contentAreaText = pollCompletionPage.getContentAreaText();
+		String contentAreaText = driver.findElement(By.id("contentArea")).getText();
 		assertThat(contentAreaText, containsString(text));
 	}
 
 	public void quit() {
 		driver.quit();
+	}
+
+	private void startPoll() {
+		driver.findElement(By.className("btn-primary")).click();
+	}
+
+	private void enterInitialAttributes() {
+		driver.findElement(By.id("title")).sendKeys("Test Termin");
+		driver.findElement(By.id("initiatorAlias")).sendKeys("John Doe");
+		driver.findElement(By.id("initiatorEmail")).sendKeys("john.doe@local.com");
+		driver.findElement(By.id("next1")).click();
+	}
+
+	private void selectDates() {
+		driver.findElement(By.id(composeDateCellIdentifierForDate(getDateOfTomorrow()))).click();
+		driver.findElement(By.id("next2a")).click();
+	}
+
+	private void selectTimeslots() {
+		driver.findElement(By.id("next2b")).click();
+	}
+
+	private void configurePoll() {
+		driver.findElement(By.id("next3s")).click();
+	}
+
+	private void configureVisibility() {
+		driver.findElement(By.id("finish4a")).click();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException ignored) {}
 	}
 
 	private Date getDateOfTomorrow() {
@@ -60,6 +83,10 @@ public class DoodleDriver {
 		return c.getTime();
 	}
 
+	private String composeDateCellIdentifierForDate(Date tomorrow) {
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		return "cell" + dateFormat.format(tomorrow);
+	}
 
 
 }
