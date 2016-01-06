@@ -25,3 +25,4 @@ There are three branches:
   * `step1`: This is an empty skeleton for creating your test
   * `step2`: This is an naive approach for scripting your test
   * `step3`: This approach is better, because the test script is much better to read an better to understand the intent of the test
+  * `step4`: This branch shows how to use Page Objects to structure the glue code.
