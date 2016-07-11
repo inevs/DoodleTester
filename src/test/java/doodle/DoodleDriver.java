@@ -3,6 +3,7 @@ package doodle;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +19,10 @@ public class DoodleDriver {
 	private PollCompletionPage pollCompletionPage;
 
 	public DoodleDriver() {
+		FirefoxProfile profile = new FirefoxProfile();
+		profile.setPreference("browser.startup.homepage", "about:blank");
+		profile.setPreference("startup.homepage_welcome_url", "about:blank");
+		profile.setPreference("startup.homepage_welcome_url.additional", "about:blank");
 		driver = new FirefoxDriver();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
